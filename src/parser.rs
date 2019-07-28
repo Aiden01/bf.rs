@@ -3,7 +3,7 @@ use combine::parser::char::char;
 use combine::error::{ParseError};
 use combine::stream::{Stream};
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum Instr {
     MLeft,
     MRight,

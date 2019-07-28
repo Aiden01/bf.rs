@@ -32,7 +32,7 @@ pub fn info<T: AsRef<str>>(msg: T) {
 pub fn prompt<T: AsRef<str> + Display>(msg: T) -> String {
     let mut input = String::new();
     let log = format_msg(Importance::Info, &format!("{} ➤ ", msg));
-    print!("{}", log);
+    print!("\n{}", log);
     io::stdout().flush();
     io::stdin().read_line(&mut input).expect("Unable to read line");
     input

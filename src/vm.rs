@@ -1,7 +1,6 @@
 use crate::logger::{error, prompt};
 use crate::parser::Instr;
 use std::cmp::{max, min};
-use std::io::{stdout, Write};
 use Instr::*;
 
 pub struct Vm {
@@ -23,7 +22,7 @@ impl Vm {
 
     pub fn run(&mut self, instrs: Vec<Instr>) -> VmResult<()> {
         for instr in instrs {
-            let result = self.execute_instr(instr)?;
+            self.execute_instr(instr)?;
         }
 
         Ok(())
@@ -81,10 +80,10 @@ impl Vm {
 
     fn stdin(&mut self) -> VmResult<()> {
         let mut line = String::new();
-        line = prompt("Enter char");
+        line = prompt("Enter char")?;
         while line.len() != 2 {
             error("Please enter a single char.");
-            line = prompt("Enter char");
+            line = prompt("Enter char")?;
         }
 
         let c = line.as_bytes()[0];

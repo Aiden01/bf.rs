@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 combine = "3.8.1"
 colored = "1.8.0"
+cmdparser = "0.2.0"

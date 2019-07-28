@@ -1,26 +1,35 @@
-#[macro_use]
-extern crate combine;
+#[macro_use] extern crate combine;
+
 
 use crate::combine::Parser;
 mod parser;
-use parser::instrs;
 mod logger;
 use logger::prompt;
 mod vm;
 use vm::Vm;
 
-fn main() {
+fn run_code(input: &str) {
     let mut vm = Vm::new(3000);
-    loop {
-        let input = prompt("Enter brainfuck code");
-        let result = parser::instrs().parse(input.as_str());
-        match result {
-            Err(e) => logger::error("Cannot parse brainfuck code"),
-            Ok((ast, _)) => {
-                if let Err(e) = vm.run(ast) {
-                    logger::error(format!("Error: {:?}", e));
-                }
+    let result = parser::instrs().parse(input);
+    match result {
+        Err(_) => logger::error("Cannot parse brainfuck code"),
+        Ok((ast, _)) => {
+            if let Err(e) = vm.run(ast) {
+                logger::error(format!("Error: {:?}", e));
             }
+        }
+    };
+}
+
+fn main() {
+    let (arguments, _) = cmdparser::Parser::new().parse();
+    if let Some(input) = arguments.get("c") {
+        return run_code(&input[0]);
+    }
+    loop {
+        match prompt("Enter brainfuck code") {
+            Err(e) => logger::error(format!("Error: {:?}", e)),
+            Ok(input) => run_code(&input)
         };
     }
 }

@@ -1,19 +1,19 @@
 use colored::*;
+use std::fmt::Display;
 use std::io;
 use std::io::Write;
-use std::fmt::Display;
 
 enum Importance {
     Info,
     Success,
-    Error
+    Error,
 }
 
 fn format_msg(importance: Importance, msg: &str) -> ColoredString {
     match importance {
         Importance::Info => msg.blue(),
         Importance::Success => msg.green(),
-        Importance::Error => msg.red()
+        Importance::Error => msg.red(),
     }
 }
 
@@ -34,10 +34,8 @@ pub fn prompt<T: AsRef<str> + Display>(msg: T) -> String {
     let log = format_msg(Importance::Info, &format!("{} ➤ ", msg));
     print!("\n{}", log);
     io::stdout().flush();
-    io::stdin().read_line(&mut input).expect("Unable to read line");
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Unable to read line");
     input
 }
-
-
-
-

@@ -1,25 +1,23 @@
-
+use crate::logger::{error, prompt};
 use crate::parser::Instr;
-use crate::logger::{prompt, error};
-use Instr::*;
 use std::cmp::{max, min};
 use std::io::{stdout, Write};
+use Instr::*;
 
 pub struct Vm {
     max_memory: usize,
     memory: Vec<usize>,
-    pointer: usize
+    pointer: usize,
 }
 
 type VmResult<T> = Result<T, String>;
 
 impl Vm {
-    
     pub fn new(max_memory: usize) -> Self {
         Vm {
             max_memory,
             memory: vec![0; max_memory],
-            pointer: 0
+            pointer: 0,
         }
     }
 
@@ -47,11 +45,10 @@ impl Vm {
         self.pointer = match direction {
             MLeft => max(0, self.pointer - 1),
             MRight => min(self.max_memory, self.pointer + 1),
-            _ => unreachable!()
+            _ => unreachable!(),
         };
 
         Ok(())
-
     }
 
     fn incr(&mut self) -> VmResult<()> {
@@ -92,20 +89,16 @@ impl Vm {
 
         let c = line.as_bytes()[0];
         self.set_cell(c as usize)
-        
     }
-    
 
     fn execute_instr(&mut self, instr: Instr) -> VmResult<()> {
         match instr {
-            d @ MLeft | d @ MRight => self.move_ptr(d), 
+            d @ MLeft | d @ MRight => self.move_ptr(d),
             Incr => self.incr(),
             Decr => self.decr(),
             Loop(instrs) => self.execute_loop(instrs),
             Stdout => self.stdout(),
-            Stdin => self.stdin()
-            
+            Stdin => self.stdin(),
         }
     }
-    
 }

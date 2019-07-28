@@ -1,7 +1,7 @@
-use combine::{Parser, none_of, many, skip_many, token, between, choice, parser};
+use combine::error::ParseError;
 use combine::parser::char::char;
-use combine::error::{ParseError};
-use combine::stream::{Stream};
+use combine::stream::Stream;
+use combine::{between, choice, many, none_of, parser, skip_many, token, Parser};
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum Instr {
@@ -11,13 +11,13 @@ pub enum Instr {
     Decr,
     Stdout,
     Stdin,
-    Loop(Vec<Instr>)
+    Loop(Vec<Instr>),
 }
 
 fn comments<I>() -> impl Parser<Input = I, Output = ()>
 where
-   I: Stream<Item = char>,
-   I::Error: ParseError<I::Item, I::Range, I::Position>
+    I: Stream<Item = char>,
+    I::Error: ParseError<I::Item, I::Range, I::Position>,
 {
     skip_many(none_of("+-<>[].,".chars()))
 }
@@ -25,7 +25,7 @@ where
 fn parse_loop<I>() -> impl Parser<Input = I, Output = Instr>
 where
     I: Stream<Item = char>,
-    I::Error: ParseError<I::Item, I::Range, I::Position>
+    I::Error: ParseError<I::Item, I::Range, I::Position>,
 {
     between(token('['), token(']'), many(instr()))
         .map(Instr::Loop)
@@ -35,9 +35,8 @@ where
 fn instr_<I>() -> impl Parser<Input = I, Output = Instr>
 where
     I: Stream<Item = char>,
-    I::Error: ParseError<I::Item, I::Range, I::Position>
+    I::Error: ParseError<I::Item, I::Range, I::Position>,
 {
-
     let incr = char('+').map(|_| Instr::Incr);
     let decr = char('-').map(|_| Instr::Decr);
     let left = char('<').map(|_| Instr::MLeft);
@@ -45,18 +44,10 @@ where
     let stdin = char(',').map(|_| Instr::Stdin);
     let stdout = char('.').map(|_| Instr::Stdout);
 
-    choice((
-        parse_loop(),
-        incr,
-        decr,
-        left,
-        right,
-        stdin,
-        stdout
-    ))
+    choice((parse_loop(), incr, decr, left, right, stdin, stdout))
 }
 
-parser!{
+parser! {
     pub fn instr[I]()(I) -> Instr
     where [I: Stream<Item = char>]
     {
@@ -68,7 +59,7 @@ parser!{
 pub fn instrs<I>() -> impl Parser<Input = I, Output = Vec<Instr>>
 where
     I: Stream<Item = char>,
-    I::Error: ParseError<I::Item, I::Range, I::Position>
+    I::Error: ParseError<I::Item, I::Range, I::Position>,
 {
     many(instr())
 }
